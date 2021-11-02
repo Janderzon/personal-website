@@ -41,7 +41,7 @@
 
     private async void OnUpdate(Object source, ElapsedEventArgs e){
         TimeSpan elapsed = DateTime.Now - _lastDateTime;
-        _webGLGraphics.RotateX(elapsed.Ticks*0.0000002f);
+        _webGLGraphics.RotateY(elapsed.Ticks*0.0000002f);
         await _webGLGraphics.Render();
         _lastDateTime = DateTime.Now;
     }

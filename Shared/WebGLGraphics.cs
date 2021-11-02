@@ -190,7 +190,7 @@ class WebGLGraphics{
         _mMatrix[8] = c*_mMatrix[8]+s*_mMatrix[10];
         _mMatrix[2] = c*_mMatrix[2]-s*mv0;
         _mMatrix[6] = c*_mMatrix[6]-s*mv4;
-        _mMatrix[10] = c*_mMatrix[10]+s*mv8;
+        _mMatrix[10] = c*_mMatrix[10]-s*mv8;
     }
 
     public void RotateZ(float angle){
