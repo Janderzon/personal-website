@@ -15,7 +15,7 @@ class WebGLGraphics{
                                             "gl_Position = pMatrix*vMatrix*mMatrix*vec4(coordinates, 1.0);" + 
                                         "}";
     //Fragment shader GLSL source code
-    private const string _fragCode = "void main(void) {gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);}";
+    private const string _fragCode = "void main(void) {gl_FragColor = vec4(0.0, 0.86, 0.89, 1.0);}";
 
     private WebGLContext _webGLContext;
     private BECanvasComponent _canvasReference;
@@ -57,6 +57,10 @@ class WebGLGraphics{
         await _webGLContext.ClearDepthAsync(1); 
 
         _numIndexes = indexes.Length;
+    }
+
+    public async Task UpdateCanvasColour(float red, float green, float blue, float alpha){
+        await _webGLContext.ClearColorAsync(red, green, blue, alpha);
     }
 
     private async Task<WebGLProgram> CreateShaderProgram(){
