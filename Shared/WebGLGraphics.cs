@@ -20,7 +20,7 @@ class WebGLGraphics{
     private WebGLContext _webGLContext;
     private BECanvasComponent _canvasReference;
     private float[] _pMatrix;
-    private float[] _vMatrix = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,-2,1};
+    private float[] _vMatrix = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,-5,1};
     private float[] _mMatrix = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1};
     private WebGLUniformLocation _pMatrixLoc;
     private WebGLUniformLocation _vMatrixLoc;
