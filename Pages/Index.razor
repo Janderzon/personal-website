@@ -6,218 +6,36 @@
 <BECanvas Width="400" Height="400" @ref="_canvasReference" ></BECanvas>
 
 @code {
-    private WebGLContext _webGLContext;
-
     protected BECanvasComponent _canvasReference;
 
     private Timer _timer;
 
-    private WebGLProgram _shaderProgram;
-
-    private ushort[] _indexes;
-
-    private float[] _movementMatrix;
+    private WebGLGraphics _webGLGraphics;
 
     private DateTime _lastDateTime = new DateTime();
 
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        //Vertex shader GLSL source code
-        string vertCode =   "attribute vec3 coordinates;" +
-                            "uniform mat4 pMatrix;" + 
-                            "uniform mat4 vMatrix;" +
-                            "uniform mat4 mMatrix;" +
-                            "void main(void) {" + 
-                                "gl_Position = pMatrix*vMatrix*mMatrix*vec4(coordinates, 1.0);" + 
-                            "}";
-        
-        //Fragment shader GLSL source code
-        string fragCode = "void main(void) {gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);}";
-        
-        //Create the WebGL context
-        this._webGLContext = await this._canvasReference.CreateWebGLAsync();
-
+    {   
         float[] vertices = {-0.5f,0.5f,0.0f, -0.5f,-0.5f,0.0f, 0.5f,-0.5f,0.0f, 0.5f,0.5f,0.0f};
+        ushort[] indexes = {0,1,2, 0,2,3};
 
-        UInt16[] indexes = {0,1,2, 0,2,3};
+        _webGLGraphics = new WebGLGraphics(_canvasReference);
+        await _webGLGraphics.Initialise(vertices, indexes);        
 
-        var shaderProgram = await InitShaderProgram(this._webGLContext, vertCode, fragCode);
+        await _webGLGraphics.Render();
 
-        var vertexBuffer = await InitArrayBuffer(this._webGLContext, vertices);
-        var indexBuffer = await InitElementArrayBuffer(this._webGLContext, indexes);
-
-        await AssociateShadersToBuffers(this._webGLContext, vertexBuffer, indexBuffer, shaderProgram, "coordinates");   
-
-        float[] movementMatrix = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1};  
-
-        await DrawScene(this._webGLContext, shaderProgram, indexes.Length, movementMatrix);
-
-        this._lastDateTime = DateTime.Now;
-
-        this._shaderProgram = shaderProgram;
-        this._indexes = indexes;
-        this._movementMatrix = movementMatrix;
-
-        this._timer = new Timer(1000/60);
-        this._timer.Elapsed += OnUpdate;
-        this._timer.AutoReset = true;
-        this._timer.Enabled = true;
+        _lastDateTime = DateTime.Now;
+        _timer = new Timer(1000/60);
+        _timer.Elapsed += OnUpdate;
+        _timer.AutoReset = true;
+        _timer.Enabled = true;
     }
 
     private async void OnUpdate(Object source, ElapsedEventArgs e){
-        await DrawScene(this._webGLContext, this._shaderProgram, this._indexes.Length, this._movementMatrix);
-    }
-
-    private float[] CreateProjectionMatrix(float angle, float a, float zMin, float zMax){
-        //Prevent divide by 0
-        if(zMax <= zMin){
-            throw new Exception("Error creating projection matrix: zMax must be greater than zMin.");
-        }
-
-        //Calculate the matrix
-        float ang = MathF.Tan(0.5f*angle*MathF.PI/180);
-        float[] matrix = {  0.5f/ang, 0, 0, 0,
-                            0, 0.5f*a/ang, 0, 0,
-                            0, 0, -(zMax+zMin)/(zMax-zMin), -1,
-                            0, 0, -2*zMax*zMin/(zMax-zMin), 0   };
-        return matrix;
-    }
-
-    private async Task DrawScene(WebGLContext webGLContext, WebGLProgram shaderProgram, int numIndexes, float[] movementMatrix){
-        //Tell WebGL which shader program to use
-        await webGLContext.UseProgramAsync(shaderProgram);
-
-        //Clear the canvas
-        await webGLContext.ClearColorAsync(0, 0, 0, 1);
-
-        //Enable the depth test
-        await webGLContext.EnableAsync(EnableCap.DEPTH_TEST);
-
-        await webGLContext.DepthFuncAsync(CompareFunction.LEQUAL);
-
-        await webGLContext.ClearDepthAsync(1);
-
-        //Clear the colour buffer bit
-        await webGLContext.ClearAsync(BufferBits.COLOR_BUFFER_BIT | BufferBits.DEPTH_BUFFER_BIT);
-
-        //Set the viewport
-        await webGLContext.ViewportAsync(0, 0, (int)_canvasReference.Width, (int)_canvasReference.Height);
-
-        float[] projectionMatrix = CreateProjectionMatrix(40, (float)this._canvasReference.Width/this._canvasReference.Height, 1, 100);
-        float[] viewMatrix = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,-2,1};
-
-        TimeSpan elapsedTime = DateTime.Now-this._lastDateTime;
-
-        RotateZ(movementMatrix, elapsedTime.Ticks*0.00000002f);
-
-        this._lastDateTime = DateTime.Now;
-
-        //Get uniform locations
-        var pMatrix = await webGLContext.GetUniformLocationAsync(shaderProgram, "pMatrix");
-        var vMatrix = await webGLContext.GetUniformLocationAsync(shaderProgram, "vMatrix");
-        var mMatrix = await webGLContext.GetUniformLocationAsync(shaderProgram, "mMatrix");
-
-        await webGLContext.UniformMatrixAsync(pMatrix, false, projectionMatrix);
-        await webGLContext.UniformMatrixAsync(vMatrix, false, viewMatrix);
-        await webGLContext.UniformMatrixAsync(mMatrix, false, movementMatrix);
-
-        //Draw the triangle
-        await webGLContext.DrawElementsAsync(Primitive.TRIANGLES, numIndexes, DataType.UNSIGNED_SHORT, 0);
-    }
-
-    private void RotateZ(float[] movementMatrix, float angle){
-        float c = MathF.Cos(angle);
-        float s = MathF.Sin(angle);
-        float mv0 = movementMatrix[0];
-        float mv4 = movementMatrix[4];
-        float mv8 = movementMatrix[8];
-
-        movementMatrix[0] = c*movementMatrix[0]-s*movementMatrix[1];
-        movementMatrix[4] = c*movementMatrix[4]-s*movementMatrix[5];
-        movementMatrix[8] = c*movementMatrix[8]-s*movementMatrix[9];
-        movementMatrix[1] = c*movementMatrix[1]+s*mv0;
-        movementMatrix[5] = c*movementMatrix[5]+s*mv4;
-        movementMatrix[9] = c*movementMatrix[9]+s*mv8;
-    }
-
-    private async Task<WebGLProgram> InitShaderProgram(WebGLContext webGLContext, string vertCode, string fragCode){
-        //Load the shaders
-        var vertShader = await LoadShader(webGLContext, ShaderType.VERTEX_SHADER, vertCode);
-        var fragShader = await LoadShader(webGLContext, ShaderType.FRAGMENT_SHADER, fragCode);
-
-        //Create the shader program
-        var shaderProgram = await webGLContext.CreateProgramAsync();
-        await webGLContext.AttachShaderAsync(shaderProgram, vertShader);
-        await webGLContext.AttachShaderAsync(shaderProgram, fragShader);
-        await webGLContext.LinkProgramAsync(shaderProgram);
-
-        //Check if creating the shader program failed
-        if(!await webGLContext.GetProgramParameterAsync<bool>(shaderProgram, ProgramParameter.LINK_STATUS)){
-            throw new Exception("Unable to initialize the shader program: " + await webGLContext.GetProgramInfoLogAsync(shaderProgram));    
-        }
-
-        return shaderProgram;
-    }
-
-    private async Task<WebGLShader> LoadShader(WebGLContext webGLContext, ShaderType type, string source){
-        //Create a shader
-        var shader = await webGLContext.CreateShaderAsync(type);
-
-        //Load the source code to the shader
-        await webGLContext.ShaderSourceAsync(shader, source);
-
-        //Compile the shader
-        await webGLContext.CompileShaderAsync(shader);
-
-        //Check that the shader compiled successfully
-        if(!await webGLContext.GetShaderParameterAsync<bool>(shader, ShaderParameter.COMPILE_STATUS)){
-            throw new Exception("An error occurred when compiling the shaders: " + await webGLContext.GetShaderInfoLogAsync(shader));    
-        }
-
-        return shader;
-    }
-
-    private async Task<WebGLBuffer> InitArrayBuffer(WebGLContext webGLContext, float[] vectors){
-        //Create a buffer for the vectors and bind an empty array to it
-        var buffer = await webGLContext.CreateBufferAsync();
-        await webGLContext.BindBufferAsync(BufferType.ARRAY_BUFFER, buffer);
-
-        //Send the vectors to WebGL
-        await webGLContext.BufferDataAsync(BufferType.ARRAY_BUFFER, vectors, BufferUsageHint.STATIC_DRAW);
-
-        //Unbind the array from the buffer
-        await webGLContext.BindBufferAsync(BufferType.ARRAY_BUFFER, null);
-
-        return buffer;
-    }
-
-    private async Task<WebGLBuffer> InitElementArrayBuffer(WebGLContext webGLContext, UInt16[] elements){
-        //Create a buffer for the elements and bind an empty array to it
-        var buffer = await webGLContext.CreateBufferAsync();
-        await webGLContext.BindBufferAsync(BufferType.ELEMENT_ARRAY_BUFFER, buffer);
-
-        //Send the elements to WebGL
-        await webGLContext.BufferDataAsync(BufferType.ELEMENT_ARRAY_BUFFER, elements, BufferUsageHint.STATIC_DRAW);
-
-        //Unbind the array from the buffer
-        await webGLContext.BindBufferAsync(BufferType.ELEMENT_ARRAY_BUFFER, null);
-
-        return buffer;
-    }
-
-    private async Task AssociateShadersToBuffers(WebGLContext webGLContext, WebGLBuffer vertexBuffer, WebGLBuffer indexBuffer, WebGLProgram shaderProgram, string attribName){
-        //Bind the buffer objects
-        await webGLContext.BindBufferAsync(BufferType.ARRAY_BUFFER, vertexBuffer);
-        await webGLContext.BindBufferAsync(BufferType.ELEMENT_ARRAY_BUFFER, indexBuffer);
-
-        //Get the attribute location
-        var attribLoc = (uint)await webGLContext.GetAttribLocationAsync(shaderProgram, attribName);
-
-        //Point an attribute to the currently bound vertex buffer object
-        await webGLContext.VertexAttribPointerAsync(attribLoc, 3, DataType.FLOAT, false, 0, 0);
-
-        //Enable the attribute
-        await webGLContext.EnableVertexAttribArrayAsync(attribLoc);
+        TimeSpan elapsed = DateTime.Now - _lastDateTime;
+        _webGLGraphics.RotateZ(elapsed.Ticks*0.0000002f);
+        await _webGLGraphics.Render();
+        _lastDateTime = DateTime.Now;
     }
 }
