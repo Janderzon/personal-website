@@ -20,7 +20,7 @@ class WebGLGraphics{
     private WebGLContext _webGLContext;
     private BECanvasComponent _canvasReference;
     private float[] _pMatrix;
-    private float[] _vMatrix = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,-1,1};
+    private float[] _vMatrix = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,-2,1};
     private float[] _mMatrix = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1};
     private WebGLUniformLocation _pMatrixLoc;
     private WebGLUniformLocation _vMatrixLoc;
@@ -29,7 +29,7 @@ class WebGLGraphics{
 
     public WebGLGraphics(BECanvasComponent canvasReference){
         _canvasReference = canvasReference;
-        UpdateProjectionMatrix(40, (float)_canvasReference.Width/_canvasReference.Height, 1, 100);
+        UpdateProjectionMatrix(40, (float)_canvasReference.Width/_canvasReference.Height, 0, 100);
     }
 
     public async Task Initialise(float[] vertices, ushort[] indexes){
@@ -161,6 +161,36 @@ class WebGLGraphics{
                             0, 0, -2*zMax*zMin/(zMax-zMin), 0   };
         
         _pMatrix = matrix;
+    }
+
+    public void RotateX(float angle){
+        float c = MathF.Cos(angle);
+        float s = MathF.Sin(angle);
+        float mv1 = _mMatrix[1];
+        float mv5 = _mMatrix[5];
+        float mv9 = _mMatrix[9];
+
+        _mMatrix[1] = c*_mMatrix[1]-s*_mMatrix[2];
+        _mMatrix[5] = c*_mMatrix[5]-s*_mMatrix[6];
+        _mMatrix[9] = c*_mMatrix[9]-s*_mMatrix[10];
+        _mMatrix[2] = c*_mMatrix[2]+s*mv1;
+        _mMatrix[6] = c*_mMatrix[6]+s*mv5;
+        _mMatrix[10] = c*_mMatrix[10]+s*mv9;
+    }
+
+    public void RotateY(float angle){
+        float c = MathF.Cos(angle);
+        float s = MathF.Sin(angle);
+        float mv0 = _mMatrix[0];
+        float mv4 = _mMatrix[4];
+        float mv8 = _mMatrix[8];
+
+        _mMatrix[0] = c*_mMatrix[0]+s*_mMatrix[2];
+        _mMatrix[4] = c*_mMatrix[4]+s*_mMatrix[6];
+        _mMatrix[8] = c*_mMatrix[8]+s*_mMatrix[10];
+        _mMatrix[2] = c*_mMatrix[2]-s*mv0;
+        _mMatrix[6] = c*_mMatrix[6]-s*mv4;
+        _mMatrix[10] = c*_mMatrix[10]+s*mv8;
     }
 
     public void RotateZ(float angle){
