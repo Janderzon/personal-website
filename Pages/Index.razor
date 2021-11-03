@@ -2,3 +2,42 @@
 
 <h1>Welcome to my website!</h1>
 <h2>I'm James.</h2>
+
+<BECanvas Width="400" Height="400" @ref="_canvasReference" ></BECanvas>
+
+@code {
+    protected BECanvasComponent _canvasReference;
+    private WebGLGraphics _webGLGraphics;
+    private DateTime _lastDateTime = new DateTime();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {   
+        if(firstRender){
+            float[] vertices = {-1,-1,-1, 1,-1,-1, 1, 1,-1, -1, 1,-1,
+                                -1,-1, 1, 1,-1, 1, 1, 1, 1, -1, 1, 1,
+                                -1,-1,-1, -1, 1,-1, -1, 1, 1, -1,-1, 1,
+                                1,-1,-1, 1, 1,-1, 1, 1, 1, 1,-1, 1,
+                                -1,-1,-1, -1,-1, 1, 1,-1, 1, 1,-1,-1,
+                                -1, 1,-1, -1, 1, 1, 1, 1, 1, 1, 1,-1};
+            ushort[] indexes = {0,1,2, 0,2,3, 4,5,6, 4,6,7,
+                                8,9,10, 8,10,11, 12,13,14, 12,14,15,
+                                16,17,18, 16,18,19, 20,21,22, 20,22,23};
+
+            _webGLGraphics = new WebGLGraphics(_canvasReference);
+            await _webGLGraphics.Initialise(vertices, indexes);
+
+            await _webGLGraphics.UpdateCanvasColour(1, 1, 1, 0);        
+
+            _lastDateTime = DateTime.Now;
+            await _webGLGraphics.Render();
+        }else if(_webGLGraphics != null){
+            TimeSpan elapsed = DateTime.Now - _lastDateTime;
+            _lastDateTime = DateTime.Now;
+            _webGLGraphics.RotateY(elapsed.Ticks*0.0000002f);
+            await _webGLGraphics.Render();
+        }
+
+        await Task.Delay(5);
+        StateHasChanged();
+    }
+}
