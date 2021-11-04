@@ -2,11 +2,13 @@
 
 <h1>My Projects</h1>
 
-<h2>Coding Projects</h2>
-<ul class="coding projects">
-    <li class="list item">
-        <NavLink class="nav-link" href="/projects/buildingmywebsite">
-            Building my website
-        </NavLink>
-    </li>
-</ul>
+<ProjectsList title="Coding Projects" Pages=@_codingProjects @ref="_codingProjectsList" />
+
+@code{
+    private ProjectsList _codingProjectsList;
+    private List<Tuple<string, string>> _codingProjects = new List<Tuple<string, string>>();
+
+    protected override void OnInitialized(){
+        _codingProjects.Add(new ("Building my website", "/projects/building-my-website"));
+    }
+}
