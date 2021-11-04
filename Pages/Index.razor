@@ -1,18 +1,28 @@
 ﻿@page "/"
+@inject IJSRuntime jsRuntime
 
 <h1>Welcome to my website!</h1>
 <h2>I'm James.</h2>
 
-<BECanvas Width="400" Height="400" @ref="_canvasReference" ></BECanvas>
+<BECanvas Width=@_canvasSize Height=@_canvasSize @ref="_canvasReference" ></BECanvas>
 
 @code {
     protected BECanvasComponent _canvasReference;
     private WebGLGraphics _webGLGraphics;
     private DateTime _lastDateTime = new DateTime();
+    private long _canvasSize {get;set;} = 400;
+
+    private class WindowDimensions{
+        public int Width    {get;set;}
+        public int Height  {get;set;}
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {   
         if(firstRender){
+            var window = await jsRuntime.InvokeAsync<WindowDimensions>("getWindowDimensions");
+            _canvasSize = (long)(0.75*Math.Min(window.Height, window.Width));
+            StateHasChanged();
             float[] vertices = {-1,-1,-1, 1,-1,-1, 1, 1,-1, -1, 1,-1,
                                 -1,-1, 1, 1,-1, 1, 1, 1, 1, -1, 1, 1,
                                 -1,-1,-1, -1, 1,-1, -1, 1, 1, -1,-1, 1,
