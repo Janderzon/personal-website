@@ -1,0 +1,18 @@
+<h2 class="list title">@Title</h2>
+<ul class="list">
+    @foreach((string name, string link) in Pages){
+        <li class="list item">
+            <NavLink class="list nav-link" href=@link>
+                @name
+            </NavLink>
+        </li>
+    }
+</ul>
+
+@code{
+    [Parameter]
+    public string Title {get; set;} = "Title not set";
+
+    [Parameter]
+    public List<Tuple<string, string>> Pages   {get;set;} = new List<Tuple<string, string>>();
+}

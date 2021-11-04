@@ -1,0 +1,14 @@
+@page "/projects"
+
+<h1>My Projects</h1>
+
+<TitledList title="Coding Projects" Pages=@_codingProjects @ref="_codingProjectsList" />
+
+@code{
+    private TitledList _codingProjectsList;
+    private List<Tuple<string, string>> _codingProjects = new List<Tuple<string, string>>();
+
+    protected override void OnInitialized(){
+        _codingProjects.Add(new ("Building my website", "/projects/building-my-website"));
+    }
+}
