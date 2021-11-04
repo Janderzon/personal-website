@@ -2,10 +2,10 @@
 
 <h1>My Projects</h1>
 
-<ProjectsList title="Coding Projects" Pages=@_codingProjects @ref="_codingProjectsList" />
+<TitledList title="Coding Projects" Pages=@_codingProjects @ref="_codingProjectsList" />
 
 @code{
-    private ProjectsList _codingProjectsList;
+    private TitledList _codingProjectsList;
     private List<Tuple<string, string>> _codingProjects = new List<Tuple<string, string>>();
 
     protected override void OnInitialized(){
