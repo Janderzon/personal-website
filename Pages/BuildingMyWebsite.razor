@@ -32,4 +32,12 @@
             <li>Azure builds and deploys the new version of my website.</li>
         </ol>
     </p>
+
+    <h2>Domain Name Quirks</h2>
+
+    <p>
+        I arbitrarily chose <a href="https://uk.godaddy.com/" target="_blank">GoDaddy</a> as my domain registrar. 
+        However, I then discovered that GoDaddy does not currently support ALIAS records or CNAME flattening, so pointing my root domain directly to my website is not possible.
+        I got around this issue by using GoDaddy's "Forwarding" feature to redirect traffic from my root domain to my subdomain, so visiting the root domain (<a href="http://jamesaanderson.uk" target="_blank">jamesaanderson.uk</a>) simply redirects to the subdomain (<a href="https://www.jamesaanderson.uk" target="_blank">www.jamesaanderson.uk</a>) where my website is hosted.
+    </p>
 </div>
