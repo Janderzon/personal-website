@@ -1,5 +1,7 @@
-.navbar-toggler {
-    background-color: rgba(255, 255, 255, 0.2);
+.navbar-toggler{
+    color: white;
+    background-color: transparent;
+    border-color: transparent;
 }
 
 .top-row {
@@ -9,7 +11,7 @@
 .oi {
     width: 2rem;
     font-size: 1.1rem;
-    vertical-align: text-top;
+    vertical-align: middle;
     top: -2px;
 }
 
