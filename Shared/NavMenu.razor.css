@@ -47,6 +47,13 @@
     color: white;
 }
 
+.media-icons{
+    position: absolute;
+    bottom: 0;
+    height: 3.5rem;
+    width: 100%;
+}
+
 @media (min-width: 641px) {
     .navbar-toggler {
         display: none;
