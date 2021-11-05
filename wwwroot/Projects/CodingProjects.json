@@ -1,0 +1,14 @@
+[
+    {
+        "Year": "2021",
+        "Title": "Building my website",
+        "Link": "/projects/building-my-website",
+        "TechUsed": "ASP.NET Blazor WebAssembly, Azure Static Web Apps, C#, CSS, HTML, JSON",
+        "GitHub": "https://github.com/Janderzon/personal-website"
+    },
+    {
+        "Year": "2021",
+        "Title": "IMC 64BIDS Coding Challenge",
+        "TechUsed": "Java"
+    }
+]
