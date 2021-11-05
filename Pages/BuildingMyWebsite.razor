@@ -1,22 +1,35 @@
 @page "/projects/building-my-website"
 
-<h1>Building My Website</h1>
+<div style="max-width: 50rem;">
+    <h1>Building My Website</h1>
 
-<p>
-    My website is built using Microsoft's Blazor framework.
-    Blazor allows me to create UI using C# instead of JavaScript, so both server-side and client-side logic can be written in .NET.
-    The official documentation for Blazor can be found <a href="https://docs.microsoft.com/en-gb/aspnet/core/blazor/?view=aspnetcore-5.0" target="_blank">here</a>.
-</p>
+    <p>
+        My website is built using Microsoft's Blazor framework.
+        Blazor allows me to create UI using C# instead of JavaScript, so both server-side and client-side logic can be written in .NET.
+        The official documentation for Blazor can be found <a href="https://docs.microsoft.com/en-gb/aspnet/core/blazor/?view=aspnetcore-5.0" target="_blank">here</a>.
+    </p>
 
-<h2>Hosting Model</h2>
+    <h2>Hosting Model</h2>
 
-<p>
-    There are two models for hosting a Blazor app: Blazor Server and Blazor WebAssembly.
-    I am using Blazor WebAssembly so that most of the processing required to run the website is offloaded to the client.
-    Offloading the processing to the client allows a less powerful server to be used for hosting the website, which is cheaper.
-    Also, once the Blazor WebAssembly app is downloaded into the browser, it should be more responsive than a Blazor Server app.
-    This increase in responsiveness is achieved because most user interactions will not require any network hops under the Blazor WebAssembly model.
-    The tradeoffs are that the initial loading of the website will take longer, low-end devices may struggle to run the website, and some browsers do not support WebAssembly apps.
-</p>
+    <p>
+        There are two models for hosting a Blazor app: Blazor Server and Blazor WebAssembly.
+        I am using Blazor WebAssembly so that most of the processing required to run the website is offloaded to the client.
+        Offloading the processing to the client allows a less powerful server to be used for hosting the website, which is cheaper.
+        Also, once the Blazor WebAssembly app is downloaded into the browser, it should be more responsive than a Blazor Server app.
+        This increase in responsiveness is achieved because most user interactions will not require any network hops under the Blazor WebAssembly model.
+        The tradeoffs are that the initial loading of the website will take longer, low-end devices may struggle to run the website, and some browsers do not support WebAssembly apps.
+    </p>
 
-<h2>Hosting Platform</h2>
+    <h2>Hosting Platform</h2>
+
+    <p>
+        I use <a href="https://azure.microsoft.com/en-us/services/app-service/static/#overview" target="_blank">Azure Static Web Apps</a> to host my website because they offer the ability to host a couple of small Static Web Apps for free. 
+        They also make it easy to follow a CI/CD workflow by integrating nicely with my GitHub.
+        This integration works as follows:
+        <ol>
+            <li>Azure builds and hosts a test website in a staging environment whenever I create a pull request to the deployment branch.</li>
+            <li>I test the staged website and if it operates as expected I merge the changes into the deployment branch.</li>
+            <li>Azure builds and deploys the new version of my website.</li>
+        </ol>
+    </p>
+</div>
