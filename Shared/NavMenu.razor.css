@@ -1,7 +1,11 @@
 .navbar-toggler{
     color: white;
-    background-color: transparent;
-    border-color: transparent;
+    background: none;
+    border: none;
+}
+
+.navbar-toggler:focus{
+    outline: none;
 }
 
 .top-row {
@@ -56,6 +60,12 @@
     justify-content: space-evenly;
 }
 
+@media (max-width: 640.98px) {
+    .media-icons{
+        display: none;
+    }
+}
+
 @media (min-width: 641px) {
     .navbar-toggler {
         display: none;
@@ -70,3 +80,4 @@
         display: block;
     }
 }
+
