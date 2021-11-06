@@ -60,6 +60,12 @@
     justify-content: space-evenly;
 }
 
+@media (max-width: 640.98px) {
+    .media-icons{
+        display: none;
+    }
+}
+
 @media (min-width: 641px) {
     .navbar-toggler {
         display: none;
@@ -74,3 +80,4 @@
         display: block;
     }
 }
+
