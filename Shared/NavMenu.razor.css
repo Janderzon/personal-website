@@ -1,7 +1,11 @@
 .navbar-toggler{
     color: white;
-    background-color: transparent;
-    border-color: transparent;
+    background: none;
+    border: none;
+}
+
+.navbar-toggler:focus{
+    outline: none;
 }
 
 .top-row {
