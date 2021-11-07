@@ -1,14 +1,40 @@
 [
     {
         "Year": "2021",
-        "Title": "Building my website",
+        "Title": "Personal Website",
         "Link": "/projects/building-my-website",
-        "TechUsed": "ASP.NET Blazor WebAssembly, Azure Static Web Apps, C#, CSS, HTML, JSON",
+        "TechUsed": "Azure, Blazor, C#, CSS, HTML, JSON",
         "GitHub": "https://github.com/Janderzon/personal-website"
     },
     {
         "Year": "2021",
         "Title": "IMC 64BIDS Coding Challenge",
-        "TechUsed": "Java"
+        "TechUsed": "Java, VisualVM"
+    },
+    {
+        "Year": "2021",
+        "Title": "FOREX Trading Bot",
+        "TechUsed": "C#, CTrader, TensorFlow, Python",
+        "GitHub": "https://github.com/Janderzon/DeepLearningFOREXBot"
+    },
+    {
+        "Year": "2021",
+        "Title": "Von Neumann Analysis Of RK45 In PyFR",
+        "TechUsed": "PyFR, Python"
+    },
+    {
+        "Year": "2020",
+        "Title": "Program For Simulating A Fluid In A 2D Cavity",
+        "TechUsed": "C++, BLAS, LAPACK, Linux, MPI"
+    },
+    {
+        "Year": "2019",
+        "Title": "Modular Application For Data Transfer Through Computer Networks",
+        "TechUsed": "C, C#, JSON, XML"
+    },
+    {
+        "Year": "2018",
+        "Title": "Encrypted Arduino Network",
+        "TechUsed": "Arduino, C++"
     }
 ]
