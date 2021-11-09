@@ -36,21 +36,20 @@ else
 
 @code{
     [Parameter]
-    public String ProjectsFileLoc   {get;set;}
-    private Project[] codingProjects;
+    [EditorRequired]
+    public String? ProjectsFileLoc   {get;set;}
+    private Project[]? codingProjects;
 
     protected override async Task OnInitializedAsync()
     {
-        if(ProjectsFileLoc!=null){
-            codingProjects = await Http.GetFromJsonAsync<Project[]>(ProjectsFileLoc);
-        }
+        codingProjects = await Http.GetFromJsonAsync<Project[]>(ProjectsFileLoc);
     }
 
     public class Project{
-        public string Year {get;set;}
-        public string Title  {get;set;}
-        public string Link  {get;set;}
-        public string TechUsed  {get;set;}
-        public string GitHub    {get;set;}
+        public string? Year {get;set;}
+        public string? Title  {get;set;}
+        public string? Link  {get;set;}
+        public string? TechUsed  {get;set;}
+        public string? GitHub    {get;set;}
     }
 }
