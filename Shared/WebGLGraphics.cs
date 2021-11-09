@@ -17,14 +17,14 @@ class WebGLGraphics{
     //Fragment shader GLSL source code
     private const string _fragCode = "void main(void) {gl_FragColor = vec4(0.0, 0.86, 0.89, 1.0);}";
 
-    private WebGLContext _webGLContext;
+    private WebGLContext? _webGLContext;
     private BECanvasComponent _canvasReference;
-    private float[] _pMatrix;
+    private float[]? _pMatrix;
     private float[] _vMatrix = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,-5,1};
     private float[] _mMatrix = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1};
-    private WebGLUniformLocation _pMatrixLoc;
-    private WebGLUniformLocation _vMatrixLoc;
-    private WebGLUniformLocation _mMatrixLoc;
+    private WebGLUniformLocation? _pMatrixLoc;
+    private WebGLUniformLocation? _vMatrixLoc;
+    private WebGLUniformLocation? _mMatrixLoc;
     private int _numIndexes;
 
     public WebGLGraphics(BECanvasComponent canvasReference){
@@ -60,16 +60,19 @@ class WebGLGraphics{
     }
 
     public async Task UpdateCanvasColour(float red, float green, float blue, float alpha){
-        await _webGLContext.ClearColorAsync(red, green, blue, alpha);
+        if(_webGLContext==null)   {throw new Exception("Must initialise WebGLGraphics first");}
+        await _webGLContext!.ClearColorAsync(red, green, blue, alpha);
     }
 
     private async Task<WebGLProgram> CreateShaderProgram(){
+        if(_webGLContext==null)   {throw new Exception("Must initialise WebGLGraphics first");}
+
         //Load the shaders
         var vertShader = await LoadShader(ShaderType.VERTEX_SHADER, _vertCode);
         var fragShader = await LoadShader(ShaderType.FRAGMENT_SHADER, _fragCode);
 
         //Create the shader program
-        var shaderProgram = await _webGLContext.CreateProgramAsync();
+        var shaderProgram = await _webGLContext!.CreateProgramAsync();
         await _webGLContext.AttachShaderAsync(shaderProgram, vertShader);
         await _webGLContext.AttachShaderAsync(shaderProgram, fragShader);
         await _webGLContext.LinkProgramAsync(shaderProgram);
@@ -84,7 +87,9 @@ class WebGLGraphics{
     }
 
     private async Task<WebGLShader> LoadShader(ShaderType type, string source){
-        var shader = await _webGLContext.CreateShaderAsync(type);   //Create a shader
+        if(_webGLContext==null)   {throw new Exception("Must initialise WebGLGraphics first");}
+
+        var shader = await _webGLContext!.CreateShaderAsync(type);   //Create a shader
         await _webGLContext.ShaderSourceAsync(shader, source);      //Load the source code to the shader
         await _webGLContext.CompileShaderAsync(shader);             //Compile the shader
 
@@ -97,7 +102,9 @@ class WebGLGraphics{
     }
 
     private async Task<WebGLBuffer> CreateVertexBuffer(float[] vertices){
-        var vertexBuffer = await _webGLContext.CreateBufferAsync();                         //Create a buffer for the vectors
+        if(_webGLContext==null)   {throw new Exception("Must initialise WebGLGraphics first");}
+
+        var vertexBuffer = await _webGLContext!.CreateBufferAsync();                         //Create a buffer for the vectors
         await _webGLContext.BindBufferAsync(BufferType.ARRAY_BUFFER, vertexBuffer);         //Bind an empty array to the buffer
         await _webGLContext.BufferDataAsync(BufferType.ARRAY_BUFFER,                        //Send the vectors to WebGL
                                             vertices, 
@@ -108,7 +115,9 @@ class WebGLGraphics{
     }
 
     private async Task<WebGLBuffer> CreateIndexBuffer(ushort[] indexes){
-        var indexBuffer = await _webGLContext.CreateBufferAsync();                          //Create a buffer for the elements
+        if(_webGLContext==null)   {throw new Exception("Must initialise WebGLGraphics first");}
+
+        var indexBuffer = await _webGLContext!.CreateBufferAsync();                          //Create a buffer for the elements
         await _webGLContext.BindBufferAsync(BufferType.ELEMENT_ARRAY_BUFFER, indexBuffer);  //Bind an empty array to the buffer
         await _webGLContext.BufferDataAsync(BufferType.ELEMENT_ARRAY_BUFFER,                //Send the elements to WebGL
                                             indexes, 
@@ -119,8 +128,10 @@ class WebGLGraphics{
     }
 
     private async Task AssociateShadersToBuffers(WebGLBuffer vertexBuffer, WebGLBuffer indexBuffer, WebGLProgram shaderProgram){
+        if(_webGLContext==null)   {throw new Exception("Must initialise WebGLGraphics first");}
+
         //Bind the buffer objects
-        await _webGLContext.BindBufferAsync(BufferType.ARRAY_BUFFER, vertexBuffer);
+        await _webGLContext!.BindBufferAsync(BufferType.ARRAY_BUFFER, vertexBuffer);
         await _webGLContext.BindBufferAsync(BufferType.ELEMENT_ARRAY_BUFFER, indexBuffer);
 
         //Get the attribute location
@@ -134,7 +145,9 @@ class WebGLGraphics{
     }
 
     public async Task Render(){
-        await _webGLContext.UniformMatrixAsync(_pMatrixLoc, false, _pMatrix);
+        if(_webGLContext==null)   {throw new Exception("Must initialise WebGLGraphics first");}
+
+        await _webGLContext!.UniformMatrixAsync(_pMatrixLoc, false, _pMatrix);
         await _webGLContext.UniformMatrixAsync(_vMatrixLoc, false, _vMatrix);
         await _webGLContext.UniformMatrixAsync(_mMatrixLoc, false, _mMatrix);
 
@@ -146,7 +159,9 @@ class WebGLGraphics{
     }
 
     private async Task GetMatrixLocs(WebGLProgram shaderProgram){
-        _pMatrixLoc = await _webGLContext.GetUniformLocationAsync(shaderProgram, "pMatrix");
+        if(_webGLContext==null)   {throw new Exception("Must initialise WebGLGraphics first");}
+
+        _pMatrixLoc = await _webGLContext!.GetUniformLocationAsync(shaderProgram, "pMatrix");
         _vMatrixLoc = await _webGLContext.GetUniformLocationAsync(shaderProgram, "vMatrix");
         _mMatrixLoc = await _webGLContext.GetUniformLocationAsync(shaderProgram, "mMatrix");
     }
