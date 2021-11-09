@@ -9,7 +9,7 @@ else
     <table class="table" style="max-width: 80rem;">
         <thead>
             <tr>
-                <th>Year</th>
+                <th class="yearHeader">Year</th>
                 <th>Title</th>
                 <th>Tech Used</th>
                 <th>External Links</th>
@@ -19,7 +19,7 @@ else
             @foreach (var project in codingProjects)
             {
                 <tr>
-                    <td>@project.Year</td>
+                    <td class="year">@project.Year</td>
                     <td>
                         @if(project.Link==null) {@project.Title}
                         else                    {<a href=@project.Link>@project.Title</a>}
