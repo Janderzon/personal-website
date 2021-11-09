@@ -1,0 +1,56 @@
+@inject HttpClient Http
+
+@if (codingProjects == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table" style="max-width: 80rem;">
+        <thead>
+            <tr>
+                <th>Year</th>
+                <th>Title</th>
+                <th>Tech Used</th>
+                <th>External Links</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var project in codingProjects)
+            {
+                <tr>
+                    <td>@project.Year</td>
+                    <td>
+                        @if(project.Link==null) {@project.Title}
+                        else                    {<a href=@project.Link>@project.Title</a>}
+                    </td>
+                    <td>@project.TechUsed</td>
+                    <td>
+                        @if(project.GitHub!=null)   {<a href=@project.GitHub target="_blank"><img src="/Assets/GitHub/GitHub-Mark-32px.png" alt="GitHub"></a>}
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code{
+    [Parameter]
+    public String ProjectsFileLoc   {get;set;}
+    private Project[] codingProjects;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(ProjectsFileLoc!=null){
+            codingProjects = await Http.GetFromJsonAsync<Project[]>(ProjectsFileLoc);
+        }
+    }
+
+    public class Project{
+        public string Year {get;set;}
+        public string Title  {get;set;}
+        public string Link  {get;set;}
+        public string TechUsed  {get;set;}
+        public string GitHub    {get;set;}
+    }
+}
