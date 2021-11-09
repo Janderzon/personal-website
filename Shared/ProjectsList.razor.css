@@ -1,0 +1,9 @@
+@media (max-width: 640.98px) {
+    .year{
+        display: none;
+    }
+
+    .yearHeader{
+        display: none;
+    }
+}

@@ -1,0 +1,50 @@
+[
+    {
+        "Year": "2021",
+        "Title": "3D Printed Llama",
+        "TechUsed": "Arduino, Blender, C++, Cura, Fusion"
+    },
+    {
+        "Year": "2021",
+        "Title": "Using PyFR To Investigate The Performance Of KFm Aerofoils At Low Reynolds Numbers",
+        "TechUsed": "Gmsh, Linux, MATLAB, ParaView, PyFR, Python"
+    },
+    {
+        "Year": "2020",
+        "Title": "Designing An Autonomous Blimp"
+    },
+    {
+        "Year": "2020",
+        "Title": "Designing A Regional Airliner",
+        "TechUsed": "Creo, MATLAB"
+    },
+    {
+        "Year": "2019",
+        "Title": "Designing And Building A Small Wind Turbine",
+        "TechUsed": "Creo, MATLAB"
+    },
+    {
+        "Year": "2018",
+        "Title": "Designing And Building A Load Bearing Structure",
+        "TechUsed": "MATLAB"
+    },
+    {
+        "Year": "2017",
+        "Title": "Building An FPV Quadcopter",
+        "TechUsed": "BetaFlight"
+    },
+    {
+        "Year": "2016",
+        "Title": "Building An RC Flying Wing"
+    },
+    {
+        "Year": "2015",
+        "Title": "Building A Fisher Delta 3D Printer",
+        "TechUsed": "Slic3r"
+    },
+    {
+        "Year": "2014",
+        "Title": "VEX Robotics",
+        "TechUsed": "Inventor, ROBOTC"
+    }
+]
