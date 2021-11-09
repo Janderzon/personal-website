@@ -20,7 +20,8 @@
     {
         "Year": "2021",
         "Title": "Von Neumann Analysis Of RK45 In PyFR",
-        "TechUsed": "PyFR, Python"
+        "TechUsed": "PyFR, Python",
+        "GitHub": "https://github.com/Janderzon/fully-discrete-FR-analysis"
     },
     {
         "Year": "2020",
