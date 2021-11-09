@@ -1,11 +1,11 @@
 .navbar-toggler{
     color: white;
-    background: none;
     border: none;
 }
 
 .navbar-toggler:focus{
     outline: none;
+    box-shadow: none;
 }
 
 .top-row {
