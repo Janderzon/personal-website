@@ -15,12 +15,13 @@
         "Year": "2021",
         "Title": "FOREX Trading Bot",
         "TechUsed": "C#, CTrader, TensorFlow, Python",
-        "GitHub": "https://github.com/Janderzon/DeepLearningFOREXBot"
+        "GitHub": "https://github.com/Janderzon/deep-learning-FOREX-bot"
     },
     {
         "Year": "2021",
-        "Title": "Von Neumann Analysis Of RK45 In PyFR",
-        "TechUsed": "PyFR, Python"
+        "Title": "Fully Discrete Von Neumann Analysis Of FR And RK45 In PyFR",
+        "TechUsed": "PyFR, Python",
+        "GitHub": "https://github.com/Janderzon/fully-discrete-FR-analysis"
     },
     {
         "Year": "2020",
