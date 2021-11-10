@@ -1,5 +1,6 @@
 ﻿@page "/"
-@inject IJSRuntime jsRuntime
+@inject IJSRuntime JS
+@implements IDisposable
 
 <h1>Welcome to my website!</h1>
 <h2>I'm James.</h2>
@@ -20,14 +21,26 @@
     }
 
     [JSInvokable]
-    public static void OnWindowResize(){
+    public void OnWindowResize(){
         Console.WriteLine("here");
+        SetCanvasSize();
+    }
+
+    private DotNetObjectReference<Index>? thisRef;
+    protected override async Task OnInitializedAsync()
+    {
+        thisRef = DotNetObjectReference.Create(this);
+        await JS.InvokeAsync<string>("setDotNetHelper", thisRef);
+    }    
+
+    private void SetCanvasSize(){
+
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {   
         if(firstRender){
-            var window = await jsRuntime.InvokeAsync<WindowDimensions>("getWindowDimensions");
+            var window = await JS.InvokeAsync<WindowDimensions>("getWindowDimensions");
             _canvasSize = (long)(0.75*Math.Min(window.Height, window.Width));
             StateHasChanged();
             float[] vertices = {-1,-1,-1, 1,-1,-1, 1, 1,-1, -1, 1,-1,
@@ -56,5 +69,11 @@
 
         await Task.Delay(5);
         StateHasChanged();
+    }
+
+    
+    public void Dispose()
+    {
+        thisRef?.Dispose();
     }
 }

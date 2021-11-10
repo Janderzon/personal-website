@@ -31,21 +31,25 @@
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
 
-    <script> 
+    <script>
+        window.setDotNetHelper = function (dotNetHelper) {
+            window.dotNetHelper = dotNetHelper
+        }
+
+        function windowResized() {
+            if(window.dotNetHelper != null) {
+                dotNetHelper.invokeMethodAsync('OnWindowResize')
+            }
+        }
+
+        window.onresize = windowResized;
+
         window.getWindowDimensions = function () {
             return {
                 width: window.innerWidth,
                 height: window.innerHeight
             };
-        }; 
-    </script>
-
-    <script>
-        function windowResized() {
-            DotNet.invokeMethodAsync('personal-website','OnWindowResize')
-        }
-
-        window.onresize = windowResized;
+        };
     </script>
 </body>
 
