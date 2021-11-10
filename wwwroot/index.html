@@ -32,24 +32,36 @@
     <script src="_framework/blazor.webassembly.js"></script>
 
     <script>
-        window.setDotNetHelper = function (dotNetHelper) {
+        setDotNetHelper = function (dotNetHelper) {
             window.dotNetHelper = dotNetHelper
+        }
+
+        disposeDotNetHelper = function () {
+            window.dotNetHelper = null
         }
 
         function windowResized() {
             if(window.dotNetHelper != null) {
-                dotNetHelper.invokeMethodAsync('OnWindowResize')
+                window.dotNetHelper.invokeMethodAsync('OnWindowResize')
             }
         }
 
-        window.onresize = windowResized;
+        function nextFrame(timeStamp) {
+            window.requestAnimationFrame(nextFrame);
+            if(window.dotNetHelper != null) {
+                dotNetHelper.invokeMethodAsync('OnNextFrame', timeStamp);
+            }
+        }
 
-        window.getWindowDimensions = function () {
+        getWindowDimensions = function () {
             return {
                 width: window.innerWidth,
                 height: window.innerHeight
             };
         };
+
+        window.onresize = windowResized;
+        window.requestAnimationFrame(nextFrame);
     </script>
 </body>
 

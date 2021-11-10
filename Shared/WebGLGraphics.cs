@@ -51,7 +51,7 @@ class WebGLGraphics{
         await _webGLContext.DepthFuncAsync(CompareFunction.LEQUAL);
 
         //Set the viewport
-        await _webGLContext.ViewportAsync(0, 0, (int)_canvasReference.Width, (int)_canvasReference.Height);
+        await UpdateViewport((int)_canvasReference.Width, (int)_canvasReference.Height);
 
         await _webGLContext.ClearColorAsync(0, 0, 0, 1);
         await _webGLContext.ClearDepthAsync(1); 
@@ -62,6 +62,11 @@ class WebGLGraphics{
     public async Task UpdateCanvasColour(float red, float green, float blue, float alpha){
         if(_webGLContext==null)   {throw new Exception("Must initialise WebGLGraphics first");}
         await _webGLContext!.ClearColorAsync(red, green, blue, alpha);
+    }
+
+    public async Task UpdateViewport(int width, int height){
+        if(_webGLContext==null)   {throw new Exception("Must initialise WebGLGraphics first");}
+        await _webGLContext!.ViewportAsync(0, 0, width, height);
     }
 
     private async Task<WebGLProgram> CreateShaderProgram(){

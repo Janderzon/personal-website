@@ -1,6 +1,6 @@
 ﻿@page "/"
-@inject IJSRuntime JS
 @implements IDisposable
+@inject IJSRuntime JS
 
 <h1>Welcome to my website!</h1>
 <h2>I'm James.</h2>
@@ -12,8 +12,9 @@
 @code {
     protected BECanvasComponent? _canvasReference;
     private WebGLGraphics? _webGLGraphics;
-    private DateTime _lastDateTime = new DateTime();
+    DotNetObjectReference<Index>? _thisRef;
     private long _canvasSize {get;set;} = 400;
+    private float _lastTimeStamp = 0;
 
     private class WindowDimensions{
         public int Width    {get;set;}
@@ -21,28 +22,39 @@
     }
 
     [JSInvokable]
-    public void OnWindowResize(){
-        Console.WriteLine("here");
-        SetCanvasSize();
+    public async Task OnWindowResize(){
+        await SetCanvasSize();
     }
 
-    private DotNetObjectReference<Index>? thisRef;
+    [JSInvokable]
+    public async Task OnNextFrame(float timeStamp){
+        if(_webGLGraphics != null){
+            _webGLGraphics.RotateY(0.002f*(timeStamp-_lastTimeStamp));
+            _lastTimeStamp = timeStamp;
+            await _webGLGraphics.Render();
+        }
+    }
+
     protected override async Task OnInitializedAsync()
     {
-        thisRef = DotNetObjectReference.Create(this);
-        await JS.InvokeAsync<string>("setDotNetHelper", thisRef);
+        _thisRef = DotNetObjectReference.Create(this);
+        await JS.InvokeAsync<object>("setDotNetHelper", _thisRef);
+        await base.OnInitializedAsync();
     }    
 
-    private void SetCanvasSize(){
-
+    private async Task SetCanvasSize(){
+        var window = await JS.InvokeAsync<WindowDimensions>("getWindowDimensions");
+        _canvasSize = (long)(0.75*Math.Min(window.Height, window.Width));
+        if(_webGLGraphics != null){
+            await _webGLGraphics.UpdateViewport((int)_canvasSize, (int)_canvasSize);
+        }
+        StateHasChanged();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {   
         if(firstRender){
-            var window = await JS.InvokeAsync<WindowDimensions>("getWindowDimensions");
-            _canvasSize = (long)(0.75*Math.Min(window.Height, window.Width));
-            StateHasChanged();
+            await SetCanvasSize();
             float[] vertices = {-1,-1,-1, 1,-1,-1, 1, 1,-1, -1, 1,-1,
                                 -1,-1, 1, 1,-1, 1, 1, 1, 1, -1, 1, 1,
                                 -1,-1,-1, -1, 1,-1, -1, 1, 1, -1,-1, 1,
@@ -58,22 +70,13 @@
 
             await _webGLGraphics.UpdateCanvasColour(1, 1, 1, 0);        
 
-            _lastDateTime = DateTime.Now;
-            await _webGLGraphics.Render();
-        }else if(_webGLGraphics != null){
-            TimeSpan elapsed = DateTime.Now - _lastDateTime;
-            _lastDateTime = DateTime.Now;
-            _webGLGraphics.RotateY(elapsed.Ticks*0.0000002f);
             await _webGLGraphics.Render();
         }
-
-        await Task.Delay(5);
-        StateHasChanged();
     }
 
-    
-    public void Dispose()
+    public async void Dispose()
     {
-        thisRef?.Dispose();
+        await JS.InvokeAsync<object>("disposeDotNetHelper");
+        _thisRef?.Dispose();
     }
 }
