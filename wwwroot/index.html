@@ -31,13 +31,37 @@
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
 
-    <script> 
-        window.getWindowDimensions = function () {
+    <script>
+        setDotNetHelper = function (dotNetHelper) {
+            window.dotNetHelper = dotNetHelper
+        }
+
+        disposeDotNetHelper = function () {
+            window.dotNetHelper = null
+        }
+
+        function windowResized() {
+            if(window.dotNetHelper != null) {
+                window.dotNetHelper.invokeMethodAsync('OnWindowResize')
+            }
+        }
+
+        function nextFrame(timeStamp) {
+            window.requestAnimationFrame(nextFrame);
+            if(window.dotNetHelper != null) {
+                dotNetHelper.invokeMethodAsync('OnNextFrame', timeStamp);
+            }
+        }
+
+        getWindowDimensions = function () {
             return {
                 width: window.innerWidth,
                 height: window.innerHeight
             };
-        }; 
+        };
+
+        window.onresize = windowResized;
+        window.requestAnimationFrame(nextFrame);
     </script>
 </body>
 
