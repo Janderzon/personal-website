@@ -19,6 +19,11 @@
         public int Height  {get;set;}
     }
 
+    [JSInvokable]
+    public static void OnWindowResize(){
+        Console.WriteLine("here");
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {   
         if(firstRender){

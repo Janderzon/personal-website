@@ -39,6 +39,14 @@
             };
         }; 
     </script>
+
+    <script>
+        function windowResized() {
+            DotNet.invokeMethodAsync('personal-website','OnWindowResize')
+        }
+
+        window.onresize = windowResized;
+    </script>
 </body>
 
 </html>
