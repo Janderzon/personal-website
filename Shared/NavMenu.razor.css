@@ -60,6 +60,10 @@
     justify-content: space-evenly;
 }
 
+.imgLink{
+    height: 2em;
+}
+
 @media (max-width: 640.98px) {
     .media-icons{
         display: none;
