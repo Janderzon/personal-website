@@ -12,6 +12,11 @@
 
 .linksHeader{
     width: 10%;
+    text-align: right;
+}
+
+.links{
+    text-align: right;
 }
 
 .rows{
