@@ -2,6 +2,27 @@
     height: 2rem;
 }
 
+.yearHeader{
+    width: 7%;
+}
+
+.titleHeader{
+    width: 50%;
+}
+
+.linksHeader{
+    width: 10%;
+    text-align: right;
+}
+
+.links{
+    text-align: right;
+}
+
+.rows{
+    vertical-align: middle;
+}
+
 @media (max-width: 640.98px) {
     .year{
         display: none;

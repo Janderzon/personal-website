@@ -10,22 +10,22 @@ else
         <thead>
             <tr>
                 <th class="yearHeader">Year</th>
-                <th>Title</th>
-                <th>Tech Used</th>
-                <th>External Links</th>
+                <th class="titleHeader">Title</th>
+                <th class="techUsedHeader">Tech Used</th>
+                <th class="linksHeader">Links</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var project in codingProjects)
             {
-                <tr>
+                <tr class="rows">
                     <td class="year">@project.Year</td>
                     <td>
                         @if(project.Link==null) {@project.Title}
                         else                    {<a href=@project.Link>@project.Title</a>}
                     </td>
                     <td>@project.TechUsed</td>
-                    <td>
+                    <td class="links">
                         @if(project.GitHub!=null)   {<a href=@project.GitHub target="_blank"><img class=imgLink src="/Assets/GitHub/GitHubIcon.svg" alt="GitHub"></a>}
                     </td>
                 </tr>
