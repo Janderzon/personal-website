@@ -6,30 +6,34 @@
 <h2>I'm James.</h2>
 
 <center>
-    <BECanvas Width=@_canvasSize Height=@_canvasSize @ref="_canvasReference" ></BECanvas>
+    <BECanvas Width=@_canvasSize Height=@_canvasSize @ref="_canvasReference"></BECanvas>
 </center>
 
 @code {
     protected BECanvasComponent? _canvasReference;
     private WebGLGraphics? _webGLGraphics;
     DotNetObjectReference<Index>? _thisRef;
-    private long _canvasSize {get;set;} = 400;
+    private long _canvasSize { get; set; } = 400;
     private float _lastTimeStamp = 0;
 
-    private class WindowDimensions{
-        public int Width    {get;set;}
-        public int Height  {get;set;}
+    private class WindowDimensions
+    {
+        public int Width { get; set; }
+        public int Height { get; set; }
     }
 
     [JSInvokable]
-    public async Task OnWindowResize(){
+    public async Task OnWindowResize()
+    {
         await SetCanvasSize();
     }
 
     [JSInvokable]
-    public async Task OnNextFrame(float timeStamp){
-        if(_webGLGraphics != null){
-            _webGLGraphics.RotateY(0.002f*(timeStamp-_lastTimeStamp));
+    public async Task OnNextFrame(float timeStamp)
+    {
+        if (_webGLGraphics != null)
+        {
+            _webGLGraphics.RotateY(0.002f * (timeStamp - _lastTimeStamp));
             _lastTimeStamp = timeStamp;
             await _webGLGraphics.Render();
         }
@@ -40,35 +44,33 @@
         _thisRef = DotNetObjectReference.Create(this);
         await JS.InvokeAsync<object>("setDotNetHelper", _thisRef);
         await base.OnInitializedAsync();
-    }    
+    }
 
-    private async Task SetCanvasSize(){
+    private async Task SetCanvasSize()
+    {
         var window = await JS.InvokeAsync<WindowDimensions>("getWindowDimensions");
-        _canvasSize = (long)(0.75*Math.Min(window.Height, window.Width));
-        if(_webGLGraphics != null){
+        _canvasSize = (long)(0.75 * Math.Min(window.Height, window.Width));
+        if (_webGLGraphics != null)
+        {
             await _webGLGraphics.UpdateViewport((int)_canvasSize, (int)_canvasSize);
         }
         StateHasChanged();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
-    {   
-        if(firstRender){
+    {
+        if (firstRender)
+        {
             await SetCanvasSize();
-            float[] vertices = {-1,-1,-1, 1,-1,-1, 1, 1,-1, -1, 1,-1,
-                                -1,-1, 1, 1,-1, 1, 1, 1, 1, -1, 1, 1,
-                                -1,-1,-1, -1, 1,-1, -1, 1, 1, -1,-1, 1,
-                                1,-1,-1, 1, 1,-1, 1, 1, 1, 1,-1, 1,
-                                -1,-1,-1, -1,-1, 1, 1,-1, 1, 1,-1,-1,
-                                -1, 1,-1, -1, 1, 1, 1, 1, 1, 1, 1,-1};
-            ushort[] indexes = {0,1,2, 0,2,3, 4,5,6, 4,6,7,
-                                8,9,10, 8,10,11, 12,13,14, 12,14,15,
-                                16,17,18, 16,18,19, 20,21,22, 20,22,23};
+            float[] vertices = {-1,-1,-1, 1,-1,-1, 1,1,-1, -1,1,-1, -1,-1,1, 1,-1,1, 1,1,1, -1,1,1, -1,-1,-1, -1,1,-1, -1,1,1,
+-1,-1,1, 1,-1,-1, 1,1,-1, 1,1,1, 1,-1,1, -1,-1,-1, -1,-1,1, 1,-1,1, 1,-1,-1, -1,1,-1, -1,1,1, 1,1,1, 1,1,-1};
+            ushort[] indexes = {0,1,2, 0,2,3, 4,5,6, 4,6,7, 8,9,10, 8,10,11, 12,13,14, 12,14,15, 16,17,18, 16,18,19, 20,21,22,
+20,22,23};
 
             _webGLGraphics = new WebGLGraphics(_canvasReference!);
             await _webGLGraphics.Initialise(vertices, indexes);
 
-            await _webGLGraphics.UpdateCanvasColour(1, 1, 1, 0);        
+            await _webGLGraphics.UpdateCanvasColour(1, 1, 1, 0);
 
             await _webGLGraphics.Render();
         }
