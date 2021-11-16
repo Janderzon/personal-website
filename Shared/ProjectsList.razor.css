@@ -6,29 +6,29 @@
     width: 7%;
 }
 
-.titleHeader{
+.titleHeader {
     width: 50%;
 }
 
-.linksHeader{
+.linksHeader {
     width: 10%;
     text-align: right;
 }
 
-.links{
+.links {
     text-align: right;
 }
 
-.rows{
+.rows {
     vertical-align: middle;
 }
 
 @media (max-width: 640.98px) {
-    .year{
+    .year {
         display: none;
     }
 
-    .yearHeader{
+    .yearHeader {
         display: none;
     }
 }
