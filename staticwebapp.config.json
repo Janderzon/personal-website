@@ -1,10 +1,4 @@
 {
-    "routes": [
-        {
-            "route": "/projects",
-            "rewrite": ""
-        }
-    ],
     "navigationFallback": {
         "rewrite": "/index.html"
     }
