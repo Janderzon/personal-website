@@ -13,6 +13,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.0" PrivateAssets="all" />
     <PackageReference Include="Blazor.Extensions.Canvas" Version="1.1.1" />
+    <TrimmableAssembly Include="Blazor.Extensions.Canvas" />
   </ItemGroup>
 
 </Project>
