@@ -29,9 +29,11 @@
 </head>
 
 <body>
-    <script src="_content/Blazor.Extensions.Canvas/blazor.extensions.canvas.js"></script>
-
-    <div id="app">Loading...</div>
+    <div id="app">
+        <div class="loading">
+            <div class="loader"></div>
+        </div>
+    </div>
 
     <div id="blazor-error-ui">
         An unhandled error has occurred.
@@ -39,6 +41,8 @@
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
+
+    <script src="_content/Blazor.Extensions.Canvas/blazor.extensions.canvas.js"></script>
 
     <script>
         setDotNetHelper = function (dotNetHelper) {
