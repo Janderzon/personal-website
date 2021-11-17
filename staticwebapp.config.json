@@ -1,7 +1,8 @@
 {
     "routes": [
         {
-            "route": "/projects"
+            "route": "/projects",
+            "rewrite": ""
         }
     ]
 }
