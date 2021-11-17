@@ -56,7 +56,7 @@ class WebGLGraphics
         //Set the viewport
         await UpdateViewport((int)_canvasReference.Width, (int)_canvasReference.Height);
 
-        await _webGLContext.ClearColorAsync(0, 0, 0, 1);
+        await _webGLContext.ClearColorAsync(1, 1, 1, 1);
         await _webGLContext.ClearDepthAsync(1);
 
         _numIndexes = indexes.Length;
