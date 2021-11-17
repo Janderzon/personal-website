@@ -9,7 +9,8 @@
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
     <link href="personal-website.styles.css" rel="stylesheet" />
-    
+
+    <!-- favicon settings -->
     <link rel="apple-touch-icon" sizes="180x180" href="/Assets/Favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/Assets/Favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/Assets/Favicon/favicon-16x16.png">
@@ -18,10 +19,18 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
 
-    <script src="_content/Blazor.Extensions.Canvas/blazor.extensions.canvas.js"></script>
+    <!-- metadata -->
+    <meta name="description" content="James' Website" />
+    <meta name="title" property="og:title" content="James' Website" />
+    <meta property="og:type" content="Website" />
+    <meta name="image" property="og:image" content="https://www.jamesaanderson.uk/Assets/Images/metaImage.jpg" />
+    <meta name="description" property="og:description" content="James' Website" />
+    <meta name="author" content="James Anderson" />
 </head>
 
 <body>
+    <script src="_content/Blazor.Extensions.Canvas/blazor.extensions.canvas.js"></script>
+
     <div id="app">Loading...</div>
 
     <div id="blazor-error-ui">
@@ -41,14 +50,14 @@
         }
 
         function windowResized() {
-            if(window.dotNetHelper != null) {
+            if (window.dotNetHelper != null) {
                 window.dotNetHelper.invokeMethodAsync('OnWindowResize')
             }
         }
 
         function nextFrame(timeStamp) {
             window.requestAnimationFrame(nextFrame);
-            if(window.dotNetHelper != null) {
+            if (window.dotNetHelper != null) {
                 dotNetHelper.invokeMethodAsync('OnNextFrame', timeStamp);
             }
         }
