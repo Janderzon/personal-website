@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-James Anderson's personal website (https://www.jamesaanderson.uk): a standalone Blazor WebAssembly app targeting .NET 6, hosted on Azure Static Web Apps. There is no server project, no API, no solution file and no test project — the single `personal-website.csproj` sits at the repo root.
+James Anderson's personal website (https://www.jamesaanderson.uk): a standalone Blazor WebAssembly app targeting .NET 10, hosted on Azure Static Web Apps. There is no server project, no API, no solution file and no test project — the single `personal-website.csproj` sits at the repo root.
 
 ## Commands
 
@@ -12,21 +12,23 @@ James Anderson's personal website (https://www.jamesaanderson.uk): a standalone 
 dotnet build          # compile
 dotnet run            # dev server at http://localhost:5269 and https://localhost:7192
 dotnet watch run      # dev server with hot reload (opens a browser)
-dotnet publish -c Release   # production build into bin/Release/net6.0/publish/wwwroot
+dotnet publish personal-website.csproj -c Release -o bin/publish   # production build, as CI runs it; the site is bin/publish/wwwroot
 ```
 
-There are no tests and no linter. `net6.0` is out of support, so every build prints `NETSDK1138` warnings; they are expected. The project builds and runs with the .NET 10 SDK without a .NET 6 runtime installed.
+There are no tests and no linter. The published build is trimmed, so a change that relies on reflection should be checked against the publish output, not just `dotnet run`.
 
 ## Deployment
 
-`.github/workflows/azure-static-web-apps-black-moss-00039ee03.yml` builds and deploys through Azure Static Web Apps:
+`.github/workflows/azure-static-web-apps-black-moss-00039ee03.yml` deploys to Azure Static Web Apps:
 
 - A pull request against `main` gets its own staging site (torn down when the PR closes).
 - A push to `main` deploys production.
 
-So changes go through a feature branch and a PR, never straight to `main`. The workflow's `api_location: "Api"` points at a directory that does not exist; there is no API.
+So changes go through a feature branch and a PR, never straight to `main`.
 
-`staticwebapp.config.json` rewrites unknown paths to `/index.html` so that deep links to client-side routes (e.g. `/projects/building-my-website`) work in production.
+The workflow builds the site itself with the publish command above and uploads `bin/publish/wwwroot` with `skip_app_build: true`. Azure's own builder (Oryx) is deliberately not used: it lags behind new .NET SDK releases.
+
+`wwwroot/staticwebapp.config.json` rewrites unknown paths to `/index.html` so that deep links to client-side routes (e.g. `/projects/building-my-website`) work in production. It lives in `wwwroot/` so that publish copies it into the uploaded folder; Azure ignores it anywhere else.
 
 ## Architecture
 
