@@ -130,6 +130,10 @@ class WebGLGraphics
 
         await _webGLContext.DepthFuncAsync(CompareFunction.LEQUAL);
 
+        //Skip triangles facing away from the camera. WebGL's defaults are what is wanted here:
+        //the back is what gets culled, and a counter-clockwise triangle counts as the front.
+        await _webGLContext.EnableAsync(EnableCap.CULL_FACE);
+
         //Set the viewport
         await UpdateViewport((int)_canvasReference.Width, (int)_canvasReference.Height);
 
