@@ -6,18 +6,92 @@ using System.Threading.Tasks;
 
 class WebGLGraphics
 {
+    //These must match the attribute names declared in the vertex shader
     private const string _vertexAttribName = "coordinates";
+    private const string _normalAttribName = "normal";
+
     //Vertex shader GLSL source code
-    private const string _vertCode = "attribute vec3 " + _vertexAttribName + ";" +
-                                        "uniform mat4 pMatrix;" +
-                                        "uniform mat4 vMatrix;" +
-                                        "uniform mat4 mMatrix;" +
-                                        "void main(void) {" +
-                                            "gl_Position = pMatrix*vMatrix*mMatrix*vec4(coordinates, 1.0);" +
-                                        "}";
+    //Passes the position and normal on in view space, where the camera is the origin
+    private const string _vertCode = """
+        attribute vec3 coordinates;
+        attribute vec3 normal;
+        uniform mat4 pMatrix;
+        uniform mat4 vMatrix;
+        uniform mat4 mMatrix;
+        varying vec3 vViewPosition;
+        varying vec3 vViewNormal;
+
+        void main(void) {
+            mat4 mvMatrix = vMatrix * mMatrix;
+            vec4 viewPosition = mvMatrix * vec4(coordinates, 1.0);
+            vViewPosition = viewPosition.xyz;
+            // w = 0 drops the translation. This is only a valid normal transform
+            // while the model and view matrices just rotate and translate.
+            vViewNormal = (mvMatrix * vec4(normal, 0.0)).xyz;
+            gl_Position = pMatrix * viewPosition;
+        }
+        """;
+
     //Fragment shader GLSL source code
-    //The colour is CSS "gold" (#ffd700), matching the loader in app.css and the icon SVGs
-    private const string _fragCode = "void main(void) {gl_FragColor = vec4(1.0, 0.843, 0.0, 1.0);}";
+    //A metal has no colour of its own to show: all that is seen is its surroundings reflected in
+    //it, tinted by the metal. So each fragment reflects the view direction off the face and looks
+    //that direction up in a made-up studio, which stands in for an environment texture.
+    private const string _fragCode = """
+        #ifdef GL_FRAGMENT_PRECISION_HIGH
+        precision highp float;
+        #else
+        precision mediump float;
+        #endif
+        varying vec3 vViewPosition;
+        varying vec3 vViewNormal;
+
+        // A light panel standing on the studio floor: 1 inside it, 0 outside, with soft edges.
+        // It is centred on the bearing `centre` and reaches `halfWidth` either side (all in degrees),
+        // and its lower edge is at height `bottom` (as the y of the direction).
+        float panel(float bearing, float y, float centre, float halfWidth, float softness, float bottom) {
+            float offCentre = abs(mod(bearing - centre + 180.0, 360.0) - 180.0);
+            float across = 1.0 - smoothstep(halfWidth - softness, halfWidth + softness, offCentre);
+            return across * smoothstep(bottom - 0.03, bottom + 0.03, y);
+        }
+
+        // The light arriving from each direction of the studio the metal reflects.
+        // View space: +x right, +y up, +z towards the camera.
+        // The cube spins about y level with the camera, so a face turned by an angle reflects the
+        // bearing twice that angle, within about 0.25 of the horizon in y: lights outside that
+        // band are never seen.
+        vec3 studio(vec3 d) {
+            // Compass bearing of the direction: 0 is towards the camera, 90 is to the right
+            float bearing = degrees(atan(d.x, d.z));
+
+            // A dim, warm room, its floor darker than its walls
+            vec3 light = vec3(1.0, 0.6, 0.35) * mix(0.05, 0.14, smoothstep(-0.22, -0.02, d.y));
+            // Key softbox, in front of the cube to the right, brightest at the top
+            light += mix(0.5, 0.88, smoothstep(-0.06, 0.25, d.y)) * panel(bearing, d.y, 62.0, 38.0, 6.0, -0.06);
+            // Fill softbox, in front of the cube to the left
+            light += 0.4 * panel(bearing, d.y, -45.0, 50.0, 8.0, 0.02);
+            // Narrow strip light between the two, whose glint sweeps across each face as it turns to the camera
+            light += 1.3 * panel(bearing, d.y, 14.0, 2.0, 1.5, -0.3);
+            // Another behind the cube, which glints off each face as it turns away
+            light += 1.8 * panel(bearing, d.y, 150.0, 4.0, 3.0, -0.3);
+            return light;
+        }
+
+        void main(void) {
+            vec3 n = normalize(vViewNormal);
+            vec3 v = normalize(-vViewPosition);
+            vec3 r = reflect(-v, n);
+
+            // CSS "gold" (#ffd700), matching the loader in app.css and the icon SVGs, as linear light
+            vec3 gold = pow(vec3(1.0, 0.843, 0.0), vec3(2.2));
+            // Schlick's Fresnel approximation: reflections take the metal's colour, paling at grazing angles
+            vec3 reflectance = mix(gold, vec3(1.0, 0.9, 0.55), pow(1.0 - max(dot(n, v), 0.0), 5.0));
+
+            vec3 colour = reflectance * studio(r);
+            // Let overexposed highlights burn out towards white instead of clipping to pure yellow
+            colour += max(max(colour.r, colour.g) - 1.0, 0.0);
+            gl_FragColor = vec4(pow(min(colour, 1.0), vec3(1.0 / 2.2)), 1.0);
+        }
+        """;
 
     private WebGLContext? _webGLContext;
     private BECanvasComponent _canvasReference;
@@ -32,10 +106,11 @@ class WebGLGraphics
     public WebGLGraphics(BECanvasComponent canvasReference)
     {
         _canvasReference = canvasReference;
-        UpdateProjectionMatrix(40, (float)_canvasReference.Width / _canvasReference.Height, 0, 100);
+        //The near plane must be in front of the camera (zMin > 0), or every fragment gets the same depth
+        UpdateProjectionMatrix(40, (float)_canvasReference.Width / _canvasReference.Height, 1, 100);
     }
 
-    public async Task Initialise(float[] vertices, ushort[] indexes)
+    public async Task Initialise(float[] vertices, float[] normals, ushort[] indexes)
     {
         //Create the WebGL context
         _webGLContext = await _canvasReference.CreateWebGLAsync();
@@ -43,9 +118,10 @@ class WebGLGraphics
         var shaderProgram = await CreateShaderProgram();
 
         var vertexBuffer = await CreateVertexBuffer(vertices);
+        var normalBuffer = await CreateVertexBuffer(normals);
         var indexBuffer = await CreateIndexBuffer(indexes);
 
-        await AssociateShadersToBuffers(vertexBuffer, indexBuffer, shaderProgram);
+        await AssociateShadersToBuffers(vertexBuffer, normalBuffer, indexBuffer, shaderProgram);
 
         await GetMatrixLocs(shaderProgram);
 
@@ -144,16 +220,27 @@ class WebGLGraphics
         return indexBuffer;
     }
 
-    private async Task AssociateShadersToBuffers(WebGLBuffer vertexBuffer, WebGLBuffer indexBuffer, WebGLProgram shaderProgram)
+    private async Task AssociateShadersToBuffers(WebGLBuffer vertexBuffer, WebGLBuffer normalBuffer, WebGLBuffer indexBuffer, WebGLProgram shaderProgram)
     {
         if (_webGLContext == null) { throw new Exception("Must initialise WebGLGraphics first"); }
 
-        //Bind the buffer objects
-        await _webGLContext!.BindBufferAsync(BufferType.ARRAY_BUFFER, vertexBuffer);
-        await _webGLContext.BindBufferAsync(BufferType.ELEMENT_ARRAY_BUFFER, indexBuffer);
+        await AssociateAttributeToBuffer(vertexBuffer, shaderProgram, _vertexAttribName);
+        await AssociateAttributeToBuffer(normalBuffer, shaderProgram, _normalAttribName);
+
+        //Bind the index buffer
+        await _webGLContext!.BindBufferAsync(BufferType.ELEMENT_ARRAY_BUFFER, indexBuffer);
+    }
+
+    //Feeds a vec3 attribute of the shader program from a buffer of floats, three per vertex
+    private async Task AssociateAttributeToBuffer(WebGLBuffer buffer, WebGLProgram shaderProgram, string attribName)
+    {
+        if (_webGLContext == null) { throw new Exception("Must initialise WebGLGraphics first"); }
+
+        //Bind the buffer object
+        await _webGLContext!.BindBufferAsync(BufferType.ARRAY_BUFFER, buffer);
 
         //Get the attribute location
-        var attribLoc = (uint)await _webGLContext.GetAttribLocationAsync(shaderProgram, _vertexAttribName);
+        var attribLoc = (uint)await _webGLContext.GetAttribLocationAsync(shaderProgram, attribName);
 
         //Point an attribute to the currently bound vertex buffer object
         await _webGLContext.VertexAttribPointerAsync(attribLoc, 3, DataType.FLOAT, false, 0, 0);
@@ -192,6 +279,12 @@ class WebGLGraphics
         if (zMax <= zMin)
         {
             throw new Exception("Error creating projection matrix: zMax must be greater than zMin.");
+        }
+
+        //With zMin at 0 every fragment lands on the far plane, so the depth test cannot tell faces apart
+        if (zMin <= 0)
+        {
+            throw new Exception("Error creating projection matrix: zMin must be greater than 0.");
         }
 
         //Calculate the matrix

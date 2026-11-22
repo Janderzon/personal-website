@@ -46,9 +46,13 @@ The rotating cube spans three files, and the animation loop is driven from JavaS
 
 1. The inline `<script>` at the bottom of `wwwroot/index.html` starts a `requestAnimationFrame` loop at page load that runs for the lifetime of the app, on every page. Each frame it calls `OnNextFrame` on `window.dotNetHelper` if one is registered; `window.onresize` calls `OnWindowResize` the same way.
 2. `Index.razor` registers itself as that helper (`setDotNetHelper`) in `OnInitializedAsync` and clears it (`disposeDotNetHelper`) in `Dispose`, so frames only reach .NET while the home page is mounted. The `[JSInvokable]` method names must match the strings in `index.html`.
-3. `OnNextFrame` rotates the model matrix by the elapsed time and calls `WebGLGraphics.Render()`. `WebGLGraphics` wraps the `Blazor.Extensions.Canvas` WebGL context: it owns the GLSL shader sources (string constants), buffer setup, and hand-written 4x4 matrices stored as column-major `float[16]` arrays (`RotateX/Y/Z` mutate the model matrix in place).
+3. `OnNextFrame` rotates the model matrix by the elapsed time and calls `WebGLGraphics.Render()`. `WebGLGraphics` wraps the `Blazor.Extensions.Canvas` WebGL context (WebGL 1, so the shaders are GLSL ES 1.00): it owns the GLSL shader sources (raw string constants), buffer setup, and hand-written 4x4 matrices stored as column-major `float[16]` arrays (`RotateX/Y/Z` mutate the model matrix in place).
 
-The canvas is sized to 75% of the smaller window dimension via the `getWindowDimensions` JS function; a resize must also call `UpdateViewport`. The cube's geometry (vertices and indexes) is defined inline in `Index.razor`.
+The canvas is sized to 75% of the smaller window dimension via the `getWindowDimensions` JS function; a resize must also call `UpdateViewport`. The cube's geometry (vertices, normals and indexes) is defined inline in `Index.razor`. Each face has four vertices of its own so that it can have its own normal; the index winding is not consistent between faces, so back-face culling cannot be turned on as it stands.
+
+The cube is polished gold. A metal shows only its surroundings, so the fragment shader reflects the view direction off the face and looks it up in a procedural "studio" of soft light panels (the `studio` function), tinted with the site's gold. There are no textures and no lighting uniforms: every lighting constant is in the shader source, which keeps `Render()` to the same few JS interop calls per frame. Lighting is done in view space, and normals are transformed with the model and view matrices directly, which is only correct while those matrices do nothing but rotate and translate.
+
+Hidden faces are removed by the depth test alone, which needs the projection's near plane (`zMin`) to be above 0: at 0 every fragment gets the same depth and faces are drawn over each other in index order.
 
 ### Styling
 
