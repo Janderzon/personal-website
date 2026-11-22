@@ -28,13 +28,17 @@ So changes go through a feature branch and a PR, never straight to `main`.
 
 The workflow builds the site itself with the publish command above and uploads `bin/publish/wwwroot` with `skip_app_build: true`. Azure's own builder (Oryx) is deliberately not used: it lags behind new .NET SDK releases.
 
-`wwwroot/staticwebapp.config.json` rewrites unknown paths to `/index.html` so that deep links to client-side routes (e.g. `/projects/building-my-website`) work in production. It lives in `wwwroot/` so that publish copies it into the uploaded folder; Azure ignores it anywhere else.
+`wwwroot/staticwebapp.config.json` rewrites unknown paths to `/index.html` so that any path loads the app instead of Azure's 404 page; the app's router then takes over (see Routing below). It lives in `wwwroot/` so that publish copies it into the uploaded folder; Azure ignores it anywhere else.
 
 ## Architecture
 
 ### Namespaces
 
-The root namespace is `personal_website` (the hyphen in the project name becomes an underscore). `Shared/WebGLGraphics.cs` is the exception: it declares no namespace, so `WebGLGraphics` lives in the global namespace.
+The root namespace is `personal_website` (the hyphen in the project name becomes an underscore). `Shared/WebGLGraphics.cs` is the exception: it declares no namespace, so `WebGLGraphics` lives in the global namespace. It is the only file in `Shared/`, so there is no `personal_website.Shared` namespace to import.
+
+### Routing
+
+The site is a single page: `Pages/Index.razor` at `/`, showing the cube with the GitHub and LinkedIn icon links beneath it. There is no layout component and no navigation. `Pages/NotFound.razor` is the router's `NotFoundPage` and renders nothing: it redirects every unknown address (including the old `/projects` URLs) to `/`.
 
 ### Home page cube (`Pages/Index.razor`, `Shared/WebGLGraphics.cs`, `wwwroot/index.html`)
 
@@ -46,12 +50,6 @@ The rotating cube spans three files, and the animation loop is driven from JavaS
 
 The canvas is sized to 75% of the smaller window dimension via the `getWindowDimensions` JS function; a resize must also call `UpdateViewport`. The cube's geometry (vertices and indexes) is defined inline in `Index.razor`.
 
-### Projects page (`Pages/Projects.razor`, `Shared/ProjectsList.razor`, `wwwroot/Projects/*.json`)
-
-The project tables are data-driven. `ProjectsList` fetches the JSON file named by its `ProjectsFileLoc` parameter over `HttpClient` and renders one row per entry. Adding or editing a project means editing `wwwroot/Projects/CodingProjects.json` or `EngineeringProjects.json`, not markup. Entry fields: `Year`, `Title`, `TechUsed`, plus optional `Link` (makes the title a link, used for internal write-up pages) and `GitHub` (shows the GitHub icon).
-
-A project write-up is a Razor page under `Pages/` routed at `/projects/<slug>` (see `BuildingMyWebsite.razor`) and referenced from the JSON entry's `Link`.
-
 ### Styling
 
-Global styles are in `wwwroot/css/app.css` (on top of the bundled Bootstrap and Open Iconic). Component-specific styles are in scoped `*.razor.css` files next to the component, which the build bundles into `personal-website.styles.css`. The pre-boot loading spinner is plain HTML inside `#app` in `index.html`, styled by `.loading` / `.loader` in `app.css`; Blazor replaces it once the app starts.
+There is no CSS framework. Global styles are in `wwwroot/css/app.css`, which also carries the small reset the page relies on (`box-sizing: border-box`, zero body margin). Component-specific styles are in scoped `*.razor.css` files next to the component (currently just `Pages/Index.razor.css`), which the build bundles into `personal-website.styles.css`; `index.html` links that bundle, so removing the last scoped file would leave a dead link. The canvas element is rendered by the child `BECanvas` component, so scoped rules need `::deep` to reach it. The pre-boot loading spinner is plain HTML inside `#app` in `index.html`, styled by `.loading` / `.loader` in `app.css`; Blazor replaces it once the app starts.

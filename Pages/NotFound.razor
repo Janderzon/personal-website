@@ -1,6 +1,7 @@
 @page "/not-found"
-@layout MainLayout
+@inject NavigationManager Navigation
 
-<PageTitle>Not found</PageTitle>
-
-<p role="alert">Sorry, there's nothing at this address.</p>
+@code {
+    // The site is a single page, so any unknown address goes back to it.
+    protected override void OnInitialized() => Navigation.NavigateTo("/", replace: true);
+}
