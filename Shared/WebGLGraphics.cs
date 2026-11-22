@@ -16,7 +16,8 @@ class WebGLGraphics
                                             "gl_Position = pMatrix*vMatrix*mMatrix*vec4(coordinates, 1.0);" +
                                         "}";
     //Fragment shader GLSL source code
-    private const string _fragCode = "void main(void) {gl_FragColor = vec4(0.0, 0.86, 0.89, 1.0);}";
+    //The colour is CSS "gold" (#ffd700), matching the loader in app.css and the icon SVGs
+    private const string _fragCode = "void main(void) {gl_FragColor = vec4(1.0, 0.843, 0.0, 1.0);}";
 
     private WebGLContext? _webGLContext;
     private BECanvasComponent _canvasReference;
@@ -56,7 +57,7 @@ class WebGLGraphics
         //Set the viewport
         await UpdateViewport((int)_canvasReference.Width, (int)_canvasReference.Height);
 
-        await _webGLContext.ClearColorAsync(1, 1, 1, 1);
+        await _webGLContext.ClearColorAsync(0, 0, 0, 1);
         await _webGLContext.ClearDepthAsync(1);
 
         _numIndexes = indexes.Length;
