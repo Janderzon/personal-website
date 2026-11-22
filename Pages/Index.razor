@@ -2,12 +2,15 @@
 @implements IDisposable
 @inject IJSRuntime JS
 
-<h1>Welcome to my website!</h1>
-<h2>I'm James.</h2>
-
-<center>
-    <BECanvas Width=@_canvasSize Height=@_canvasSize @ref="_canvasReference"></BECanvas>
-</center>
+<div class="home">
+    <div class="stage">
+        <BECanvas Width=@_canvasSize Height=@_canvasSize @ref="_canvasReference"></BECanvas>
+        <nav class="links">
+            <a href="https://github.com/Janderzon" target="_blank" rel="noopener"><img src="/Assets/GitHub/GitHubIcon.svg" alt="GitHub"></a>
+            <a href="https://www.linkedin.com/in/james-anderson-8336b0150" target="_blank" rel="noopener"><img src="/Assets/LinkedIn/LinkedInIcon.svg" alt="LinkedIn"></a>
+        </nav>
+    </div>
+</div>
 
 @code {
     protected BECanvasComponent? _canvasReference;

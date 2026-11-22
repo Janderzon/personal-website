@@ -1,6 +1,9 @@
-﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+﻿*, ::before, ::after {
+    box-sizing: border-box;
+}
 
 html, body {
+    margin: 0;
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
@@ -27,41 +30,6 @@ html, body {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
-}
-
-h1:focus {
-    outline: none;
-}
-
-a, .btn-link {
-    color: rgb(223, 182, 72);
-    text-decoration: none;
-}
-
-a:hover {
-    color: rgb(156, 128, 50);
-}
-
-.btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
-}
-
-.content {
-    padding-top: 1.1rem;
-}
-
-.valid.modified:not([type=checkbox]) {
-    outline: 1px solid #26b050;
-}
-
-.invalid {
-    outline: 1px solid red;
-}
-
-.validation-message {
-    color: red;
 }
 
 #blazor-error-ui {

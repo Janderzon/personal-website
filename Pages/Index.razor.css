@@ -1,0 +1,35 @@
+.home {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Shrinks to the canvas, so the cube is centred in the viewport and the links
+   can be placed relative to the canvas. */
+.stage {
+    position: relative;
+}
+
+/* The canvas is rendered by the child BECanvas component, so it needs ::deep */
+.stage ::deep canvas {
+    display: block;
+}
+
+/* The cube only fills the middle of its square canvas: as it spins, its lowest
+   point reaches about 69% of the way down. The links sit in the empty band
+   below that, so they are just under the cube rather than under the canvas. */
+.links {
+    position: absolute;
+    top: calc(72% + 0.5rem);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 2rem;
+}
+
+.links img {
+    display: block;
+    height: 2.5rem;
+}
