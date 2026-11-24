@@ -26,10 +26,31 @@
     left: 50%;
     transform: translateX(-50%);
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.icons {
+    display: flex;
     gap: 2rem;
 }
 
-.links img {
+.icons img {
     display: block;
     height: 2.5rem;
+}
+
+/* Kept quieter than the icons until it is pointed at */
+.lighting-link {
+    color: gold;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    text-decoration: none;
+    opacity: 0.7;
+}
+
+.lighting-link:hover, .lighting-link:focus-visible {
+    opacity: 1;
+    text-decoration: underline;
 }

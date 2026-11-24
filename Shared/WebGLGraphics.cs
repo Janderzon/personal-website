@@ -36,6 +36,8 @@ class WebGLGraphics
     //A metal has no colour of its own to show: all that is seen is its surroundings reflected in
     //it, tinted by the metal. So each fragment reflects the view direction off the face and looks
     //that direction up in a made-up studio, which stands in for an environment texture.
+    //The /lighting page (Pages/Lighting.razor) draws and tabulates the lights in `studio`,
+    //so a change to a light here needs the same change there.
     private const string _fragCode = """
         #ifdef GL_FRAGMENT_PRECISION_HIGH
         precision highp float;
