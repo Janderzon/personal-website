@@ -1,0 +1,244 @@
+@page "/lighting"
+@using System.Globalization
+
+<PageTitle>How the cube is lit - James' Website</PageTitle>
+
+@* This page describes the `studio` function of the fragment shader in Shared/WebGLGraphics.cs.
+   Every bearing, height and brightness below is copied from there, so a change to one needs the
+   same change to the other.
+
+   Nothing in the drawings is referenced by url(#id) (no markers, no gradients): some browsers
+   resolve that against <base href="/"> instead of this page, and then find nothing. Arrowheads
+   are polygons and the fades are thin slices for that reason. *@
+
+<article class="lighting">
+
+    <header>
+        <a class="back" href="/">← Back to the cube</a>
+        <h1>How the cube is lit</h1>
+        <p class="lede">The gold cube on the home page has no real lights. Its shader reflects each face into a made-up studio, so the function that describes that studio is the whole lighting setup. These drawings show where each light sits around the cube and how tall it is.</p>
+    </header>
+
+    <section>
+        <h2>From above</h2>
+        <figure>
+            <div class="drawing">
+                <svg viewBox="0 0 840 600" role="img" aria-label="Plan view of the studio. The cube is in the middle with the camera in front of it. Around it, a dim warm room holds four lights: a fill softbox from 95 degrees left to 5 degrees right of the camera, a narrow front strip at 14 degrees, a key softbox from 24 to 100 degrees on the right, and a narrow rear strip at 150 degrees, behind the cube on the right. A ray shows light from the key softbox bouncing off a face turned 31 degrees and reaching the camera.">
+
+                    @* The studio wall, all the way round, and the lights on it *@
+                    <circle cx="420" cy="300" r="204" fill="none" class="band band-room" />
+                    <path d="M 216.78 282.22 A 204 204 0 0 0 437.78 503.22" fill="none" class="band band-fill" />
+                    <path d="M 502.97 486.36 A 204 204 0 0 0 620.90 264.58" fill="none" class="band band-key" />
+                    <path d="M 462.41 499.54 A 204 204 0 0 0 476.23 496.10" fill="none" class="band band-strip" />
+                    <path d="M 534.08 130.88 A 204 204 0 0 0 509.43 116.65" fill="none" class="band band-strip" />
+
+                    @* Bearing ticks every 30 degrees *@
+                    <g fill="none" class="tick">
+                        @for (var bearing = 0; bearing < 360; bearing += 30)
+                        {
+                            <line x1="420" y1="486" x2="420" y2="493" transform="rotate(@(-bearing) 420 300)" />
+                        }
+                    </g>
+                    <text x="420" y="479" text-anchor="middle" class="d-axis">0°</text>
+                    <text x="600" y="304" text-anchor="end" class="d-axis">90°</text>
+                    <text x="420" y="130" text-anchor="middle" class="d-axis">180°</text>
+                    <text x="240" y="304" text-anchor="start" class="d-axis">−90°</text>
+
+                    @* Camera axis, and the normal of the face that is catching the key light *@
+                    <line x1="420" y1="300" x2="420" y2="427" fill="none" class="guide" />
+                    <line x1="420" y1="300" x2="450.9" y2="351.4" fill="none" class="guide" />
+                    <path d="M 420 346 A 46 46 0 0 0 443.7 339.4" fill="none" class="tick" />
+                    <text x="456" y="363" class="d-axis">31°</text>
+
+                    @* The cube, turned 31 degrees *@
+                    <rect x="394" y="274" width="52" height="52" transform="rotate(-31 420 300)" class="cube" />
+                    <line x1="394" y1="326" x2="446" y2="326" transform="rotate(-31 420 300)" fill="none" class="cube-face" />
+
+                    @* Light from the key softbox, off the face, into the camera *@
+                    <polyline points="594.9,384 433.39,322.29 421.2,422" fill="none" class="ray" />
+                    <polygon points="0,0 -12,-6 -12,6" transform="translate(420.5 427.5) rotate(97)" class="head-gold" />
+                    <text x="514" y="346" text-anchor="middle" transform="rotate(20.9 514 353)" class="d-val d-gold">reflected light</text>
+
+                    @* Which way the cube turns *@
+                    <path d="M 402.2 251.1 A 52 52 0 0 0 371.1 282.2" fill="none" class="spin" />
+                    <polygon points="0,0 -8.75,-4.4 -8.75,4.4" transform="translate(370.7 283.2) rotate(110)" class="head-fg" />
+                    <text x="366" y="250" text-anchor="end" class="d-note">spin</text>
+
+                    @* Camera *@
+                    <polygon points="414,437 426,437 423,430 417,430" class="camera" />
+                    <rect x="408" y="437" width="24" height="14" rx="2" class="camera" />
+                    <text x="400" y="448" text-anchor="end" class="d-note">Camera</text>
+
+                    @* Lights *@
+                    <text x="636" y="398" class="d-name">Key softbox</text>
+                    <text x="636" y="414" class="d-val">24° to 100°</text>
+                    <text x="636" y="430" class="d-val">brightness 0.50 to 0.88</text>
+
+                    <text x="252" y="452" text-anchor="end" class="d-name">Fill softbox</text>
+                    <text x="252" y="468" text-anchor="end" class="d-val">−95° to 5°</text>
+                    <text x="252" y="484" text-anchor="end" class="d-val">brightness 0.40</text>
+
+                    <text x="484" y="536" class="d-name">Front strip</text>
+                    <text x="484" y="552" class="d-val">12° to 16°</text>
+                    <text x="484" y="568" class="d-val">brightness 1.3</text>
+
+                    <text x="556" y="86" class="d-name">Rear strip</text>
+                    <text x="556" y="102" class="d-val">146° to 154°</text>
+                    <text x="556" y="118" class="d-val">brightness 1.8</text>
+
+                    <text x="252" y="120" text-anchor="end" class="d-name">Room</text>
+                    <text x="252" y="136" text-anchor="end" class="d-val">everywhere else</text>
+                    <text x="252" y="152" text-anchor="end" class="d-val">brightness 0.14, warm</text>
+                </svg>
+            </div>
+            <figcaption>The studio seen from above, with the cube at the centre. Bearings run from 0° on the camera's side round to 180° behind the cube, positive to the right. The lights are directions, not objects at a distance, so the ring only shows which way each one lies. Here the face turned 31° is reflecting the key softbox into the camera.</figcaption>
+        </figure>
+    </section>
+
+    <section>
+        <h2>Unrolled, as the faces see it</h2>
+        <figure>
+            <div class="drawing">
+                <svg viewBox="0 0 840 318" role="img" aria-label="The studio unrolled into a strip, bearing from minus 180 to 180 degrees across and height up the side. The fill softbox spans minus 95 to 5 degrees and stops just above eye level. The key softbox spans 24 to 100 degrees, reaches a little below eye level and is brightest at the top. The front strip at 14 degrees and the rear strip at 150 degrees run the full height. The room is dim everywhere else and darkens into the floor.">
+
+                    @* A bearing is drawn at x = 440 + 2 * bearing and a height at y = 150 - 400 * height.
+                       crispEdges keeps the slices below from showing seams where they meet. *@
+                    <g shape-rendering="crispEdges">
+                        @* The room and the key softbox both change brightness with height, so each is drawn as
+                           slices 0.01 of height tall, shaded by the same formula as the shader uses *@
+                        @for (var y = 50; y < 250; y += 4)
+                        {
+                            var height = (150 - (y + 2)) / 400.0;
+                            var room = 0.05 + 0.09 * Smoothstep(-0.22, -0.02, height);
+                            <rect x="80" y="@y" width="720" height="4" class="area-room" fill-opacity="@Number(4 * room)" />
+                        }
+
+                        <rect x="250" y="50" width="200" height="92" class="area-fill" />
+                        @for (var y = 50; y < 174; y += 4)
+                        {
+                            var height = (150 - (y + 2)) / 400.0;
+                            var key = 0.5 + 0.38 * Smoothstep(-0.06, 0.25, height);
+                            <rect x="488" y="@y" width="152" height="4" class="area-key" fill-opacity="@Number(key)" />
+                        }
+                        <rect x="464" y="50" width="8" height="200" class="area-strip" />
+                        <rect x="732" y="50" width="16" height="200" class="area-strip" />
+                    </g>
+
+                    @* Eye level *@
+                    <line x1="80" y1="150" x2="800" y2="150" fill="none" class="guide" />
+                    <rect x="80" y="50" width="720" height="200" fill="none" class="frame" />
+
+                    @* Names *@
+                    <text x="350" y="100" text-anchor="middle" class="d-name">Fill softbox</text>
+                    <text x="564" y="100" text-anchor="middle" class="d-name d-on-gold">Key softbox</text>
+                    <text x="468" y="38" text-anchor="middle" class="d-name">Front strip</text>
+                    <text x="740" y="38" text-anchor="middle" class="d-name">Rear strip</text>
+                    <text x="165" y="100" text-anchor="middle" class="d-name">Room</text>
+                    <text x="165" y="238" text-anchor="middle" class="d-val">floor, brightness 0.05</text>
+
+                    @* Height axis *@
+                    <text x="70" y="54" text-anchor="end" class="d-axis">0.25</text>
+                    <text x="70" y="154" text-anchor="end" class="d-axis">0</text>
+                    <text x="70" y="250" text-anchor="end" class="d-axis">−0.25</text>
+                    <text x="22" y="150" text-anchor="middle" transform="rotate(-90 22 150)" class="d-axis">height</text>
+
+                    @* Bearing axis *@
+                    <g fill="none" class="tick">
+                        @for (var x = 80; x <= 800; x += 180)
+                        {
+                            <line x1="@x" y1="250" x2="@x" y2="257" />
+                        }
+                    </g>
+                    <text x="80" y="274" text-anchor="middle" class="d-axis">−180°</text>
+                    <text x="260" y="274" text-anchor="middle" class="d-axis">−90°</text>
+                    <text x="440" y="274" text-anchor="middle" class="d-axis">0°</text>
+                    <text x="620" y="274" text-anchor="middle" class="d-axis">90°</text>
+                    <text x="800" y="274" text-anchor="middle" class="d-axis">180°</text>
+                    <text x="80" y="292" text-anchor="middle" class="d-note">behind</text>
+                    <text x="260" y="292" text-anchor="middle" class="d-note">left</text>
+                    <text x="440" y="292" text-anchor="middle" class="d-note">camera side</text>
+                    <text x="620" y="292" text-anchor="middle" class="d-note">right</text>
+                    <text x="800" y="292" text-anchor="middle" class="d-note">behind</text>
+                </svg>
+            </div>
+            <figcaption>The same studio cut open behind the cube and laid flat. Height is the vertical part of the reflected direction, with 0 at the camera's eye level; the cube's faces only ever reflect the band from −0.25 to 0.25 drawn here. The two softboxes stop at different heights, which is why the dark floor line sits lower on a key-lit face than on a fill-lit one. The lights' edges are drawn sharp; each really fades over the distance listed below.</figcaption>
+        </figure>
+    </section>
+
+    <section>
+        <h2>The numbers</h2>
+        <p>Each light is one <code>panel(...)</code> line in the <code>studio</code> function of <a href="https://github.com/Janderzon/personal-website/blob/main/Shared/WebGLGraphics.cs" target="_blank" rel="noopener">the cube's fragment shader</a>. A brightness of 1.0 comes out as the site's gold, <code>#ffd700</code>; anything above that burns out towards white.</p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th scope="col">Light</th><th scope="col">Bearing</th><th scope="col">Edge fade</th><th scope="col">Lower edge</th><th scope="col">Brightness</th><th scope="col">What it does on the cube</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">Key softbox</th>
+                        <td class="num">62° ± 38°<small>24° to 100°</small></td>
+                        <td class="num">± 6°</td>
+                        <td class="num">−0.06</td>
+                        <td class="num">0.50 to 0.88<small>brighter higher up</small></td>
+                        <td>The bright gold face, from just after it passes the camera until it is turned about 45° to the right.</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Fill softbox</th>
+                        <td class="num">−45° ± 50°<small>−95° to 5°</small></td>
+                        <td class="num">± 8°</td>
+                        <td class="num">0.02</td>
+                        <td class="num">0.40</td>
+                        <td>The dimmer gold face coming round from the left, so the two visible faces are never both dark.</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Front strip</th>
+                        <td class="num">14° ± 2°<small>12° to 16°</small></td>
+                        <td class="num">± 1.5°</td>
+                        <td class="num">−0.30<small>below the band</small></td>
+                        <td class="num">1.3</td>
+                        <td>The thin glint that sweeps across a face as it squares up to the camera, between the fill and the key.</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Rear strip</th>
+                        <td class="num">150° ± 4°<small>146° to 154°</small></td>
+                        <td class="num">± 3°</td>
+                        <td class="num">−0.30<small>below the band</small></td>
+                        <td class="num">1.8</td>
+                        <td>The near-white flash on a face when it is almost edge-on and about to turn out of sight.</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Room</th>
+                        <td class="num">all round</td>
+                        <td class="num">none</td>
+                        <td class="num">none</td>
+                        <td class="num">0.14 walls<small>0.05 floor</small></td>
+                        <td>The deep amber of unlit faces and the dark lower part of every face. It is tinted orange, so shadows read as amber and not olive.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section>
+        <h2>Reading the drawings</h2>
+        <ul class="notes">
+            <li>A face turned by some angle from the camera reflects roughly twice that bearing. A light at 60° shows on a face turned about 30°, and each face sweeps the whole strip from left to right as it crosses the front of the cube.</li>
+            <li>The two faces in view are a quarter turn apart, so they reflect opposite sides of the studio. With the key on the right and nothing bright opposite it, one face is always darker than the other.</li>
+            <li>Nothing within about 11° of directly behind the cube is ever reflected, and nothing above 0.25 or below −0.25 in height. A light placed there would never be seen.</li>
+            <li>There is no distance, falloff or shadow. Moving a light means changing its bearing, width or lower edge in its <code>panel(...)</code> line.</li>
+        </ul>
+    </section>
+
+</article>
+
+@code {
+    //Numbers written into a drawing need "." as the decimal point whatever the visitor's language is
+    private static string Number(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
+
+    //The GLSL function of the same name
+    private static double Smoothstep(double edge0, double edge1, double x)
+    {
+        var t = Math.Clamp((x - edge0) / (edge1 - edge0), 0, 1);
+        return t * t * (3 - 2 * t);
+    }
+}
